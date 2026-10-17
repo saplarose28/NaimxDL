@@ -1,11 +1,11 @@
 
-name: Direct File Downloader
+name: Direct Download and Upload
 
 on:
   workflow_dispatch:
     inputs:
       file_url:
-        description: "Direct URL of a file you are allowed to download"
+        description: "Direct HTTPS file URL"
         required: true
         type: string
 
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  download:
+  transfer:
     runs-on: ubuntu-latest
     timeout-minutes: 350
 
@@ -26,7 +26,10 @@ jobs:
 
       - run: pip install requests
 
-      - name: Download file
+      - name: Download and upload
         env:
           FILE_URL: ${{ inputs.file_url }}
+          GOFILE_TOKEN: ${{ secrets.GOFILE_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python download.py
