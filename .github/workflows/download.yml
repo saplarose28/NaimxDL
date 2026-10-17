@@ -1,14 +1,13 @@
 
-name: Download Release Assets
+name: Direct File Downloader
 
 on:
   workflow_dispatch:
     inputs:
-      release_url:
-        description: "GitHub Release URL"
+      file_url:
+        description: "Direct URL of a file you are allowed to download"
         required: true
         type: string
-        default: ""
 
 permissions:
   contents: read
@@ -19,20 +18,15 @@ jobs:
     timeout-minutes: 350
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
-        run: pip install requests
+      - run: pip install requests
 
-      - name: Download Release assets
+      - name: Download file
         env:
-          RELEASE_URL: ${{ inputs.release_url }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python download_upload.py
+          FILE_URL: ${{ inputs.file_url }}
+        run: python download.py
