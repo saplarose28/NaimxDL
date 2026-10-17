@@ -1,7 +1,14 @@
+
 name: Download Release Assets
 
 on:
   workflow_dispatch:
+    inputs:
+      release_url:
+        description: "GitHub Release URL"
+        required: true
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -12,17 +19,20 @@ jobs:
     timeout-minutes: 350
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - run: pip install requests
+      - name: Install dependencies
+        run: pip install requests
 
       - name: Download Release assets
         env:
-          RELEASE_URL: ${{ secrets.RELEASE_URL }}
+          RELEASE_URL: ${{ inputs.release_url }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python download_upload.py
