@@ -42,15 +42,15 @@ on:
         required: false
         default: ""
       ticket:
-        description: "Leave empty (used only by the shared bot)"
+        description: "Set by the Telegram worker (the stream link is kept there, not on GitHub). Leave empty when you start it by hand."
         required: false
         default: ""
       chat:
-        description: "Leave empty (used only by the shared bot)"
+        description: "Set by the Telegram worker: the chat that gets the messages. Empty = your own chat (secret TG_CHAT)."
         required: false
         default: ""
       also:
-        description: "Leave empty (used only by the shared bot)"
+        description: "Set by the Telegram worker: extra chat ids that get a copy of the messages (the owner)."
         required: false
         default: ""
 
@@ -64,10 +64,17 @@ jobs:
     timeout-minutes: 355
     env:
       PYTHONUNBUFFERED: "1"
-      TG_TOKEN: ${{ secrets.TG_TOKEN }}
-      TG_CHAT: ${{ secrets.TG_CHAT }}
-      WORKFLOW_FILE: record.yml
+      PARALLEL: "32"            # connections for big archive downloads (lower it if the provider blocks you)
+      PAR_CHUNK_MB: "16"        # size of each downloaded piece
+      TS_PAR: "8"               # connections for timeshift links without file size
+      MIN_FREE_GB: "12"         # the download waits for uploads when the disk has less free space
       LIVE_CARD: "1"            # "1" = picture dashboard, "0" = text panel
+      TG_TOKEN: ${{ secrets.TG_TOKEN }}
+      TG_CHAT: ${{ inputs.chat || secrets.TG_CHAT }}
+      TG_ALSO: ${{ inputs.also }}
+      TICKET: ${{ inputs.ticket }}
+      WORKER_URL: ${{ secrets.WORKER_URL }}
+      WORKER_KEY: ${{ secrets.WORKER_KEY }}
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
       RUN_ID: ${{ github.run_id }}
